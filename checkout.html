@@ -57,7 +57,7 @@
                         <!-- Select All and Delete -->
                         <div class="d-flex justify-content-between">
                             <div>
-                                <input type="checkbox" onclick="checked_items_all()"> SELECT ALL (6 ITEM(S))
+                                <input type="checkbox" onclick="checked_items_all()"> SELECT ALL (<span id="card_items_total">0</span> ITEM(S))
                             </div>
                             <button class="btn btn-link text-danger" onclick="delete_items()">🗑️ DELETE</button>
                         </div>
@@ -80,14 +80,16 @@
                                 <span>Shipping Fee</span>
                                 <span>৳ 150</span>
                             </div>
-                            <input type="text" class="form-control mt-2" placeholder="Enter Voucher Code">
-                            <button class="btn btn-primary w-100 mt-2">APPLY</button>
+                            <input type="text" id="promo_code" name="promo_code" class="form-control mt-2" placeholder="Enter Promo Code">
+                            <button class="btn btn-primary w-100 mt-2" onclick="apply_promocode()">APPLY</button>
                             <hr>
                             <div class="d-flex justify-content-between">
                                 <strong>Total</strong>
                                 <strong class="text-danger">৳ <span id="total_amount"> 0</span></strong>
                             </div>
                             <button class="btn btn-warning text-white w-100 mt-2">PROCEED TO CHECKOUT (0)</button>
+                            <input type="hidden" id="hidden_subtotal" name="hidden_subtotal" />
+                       
                         </div>
                     </div>
                 </div>
@@ -123,6 +125,30 @@
     </footer>
     <script>
         // Fetch the JSON file
+
+        function apply_promocode()
+        {
+            let promo_code=document.getElementById("promo_code").value;
+
+            if(promo_code=="ostad10" || promo_code=="ostad5")
+            {
+                let subtotal_amount=document.getElementById("hidden_subtotal").value*1;
+                let discount=0;
+                if(promo_code=="ostad10")  discount=10;
+                else  discount=5;
+               // console.log(subtotal_amount);
+               // subtotal_amount=subtotal_amount-(subtotal_amount*discount/100);
+               // console.log(subtotal_amount);
+                let total_amount=subtotal_amount+150;
+                total_amount=(total_amount-(total_amount*discount/100)).toFixed(2);
+               // document.getElementById("subtotal_amount").innerHTML=subtotal_amount.toFixed(2);
+                document.getElementById("total_amount").innerHTML=total_amount;
+            }
+            else{
+                alert(" Invalid Promo Code , Please try with Valid One !")
+            }
+
+        }
         function fetch_product()
         {
             let products = JSON.parse(localStorage.getItem("products")) || [];
@@ -130,18 +156,22 @@
 
             let total_amount=0;
             let total_items=0;
+            let checkout_qty=0;
             products.forEach(product => {
                 const newCol = document.createElement('div');
                 newCol.className = 'border p-3 mb-3';
                 let product_string=JSON.stringify(product);
 
                 let product_checked="";
+              
 
                 if(product.is_checked==true){
                     product_checked="checked";
                     total_items+=product.quantity;
                     total_amount+=product.quantity*product.price;
                 }
+
+                checkout_qty+=product.quantity;
                 newCol.innerHTML = `<div class="mb-2">
                                         <strong>${product.title}</strong>
                                     </div>
@@ -171,18 +201,19 @@
             });
 
             let grand_total=total_amount+150;
+            document.getElementById("card_items_total").innerHTML=checkout_qty;
             document.getElementById("total_amount").innerHTML=grand_total;
             document.getElementById("card-quantity").innerHTML=total_items;
             document.getElementById("subtotal_item").innerHTML=total_items;
             document.getElementById("subtotal_amount").innerHTML=total_amount;
+            document.getElementById("hidden_subtotal").value=total_amount;
+            
 
             
         }
 
-        function decrease_quantity(product)
-        {
-        }
         window.onload = fetch_product;
+       
 
         function delete_items()
         {
@@ -196,10 +227,12 @@
             
             
             let grand_total=total_amount+150;
+            document.getElementById("card_items_total").innerHTML=0;
             document.getElementById("total_amount").innerHTML=grand_total;
             document.getElementById("card-quantity").innerHTML=total_items;
             document.getElementById("subtotal_item").innerHTML=total_items;
             document.getElementById("subtotal_amount").innerHTML=total_amount;
+            document.getElementById("hidden_subtotal").value=total_amount;
             fetch_product();
         }
 
@@ -213,7 +246,7 @@
             span.innerHTML = product.quantity;
             console.log(product.quantity)
 
-             let products = JSON.parse(localStorage.getItem("products")) || [];
+            let products = JSON.parse(localStorage.getItem("products")) || [];
             products = products.map(p => p.id === product.id ? product : p);
           
             localStorage.setItem("products",JSON.stringify(products));
@@ -228,10 +261,12 @@
             });
             
             let grand_total=total_amount+150;
+            document.getElementById("card_items_total").innerHTML=checkout_qty;
             document.getElementById("total_amount").innerHTML=grand_total;
             document.getElementById("card-quantity").innerHTML=total_items;
             document.getElementById("subtotal_item").innerHTML=total_items;
             document.getElementById("subtotal_amount").innerHTML=total_amount;
+            document.getElementById("hidden_subtotal").value=total_amount;
         }
 
         function decrease_quantity(product)
@@ -261,10 +296,12 @@
             });
            
             let grand_total=total_amount+150;
+            document.getElementById("card_items_total").innerHTML=checkout_qty;
             document.getElementById("total_amount").innerHTML=grand_total;
             document.getElementById("card-quantity").innerHTML=total_items;
             document.getElementById("subtotal_item").innerHTML=total_items;
             document.getElementById("subtotal_amount").innerHTML=total_amount;
+            document.getElementById("hidden_subtotal").value=total_amount;
         }
 
         function checked_items_all()
@@ -292,6 +329,7 @@
             document.getElementById("card-quantity").innerHTML=total_items;
             document.getElementById("subtotal_item").innerHTML=total_items;
             document.getElementById("subtotal_amount").innerHTML=total_amount;
+            document.getElementById("hidden_subtotal").value=total_amount;
 
         }
 
@@ -324,6 +362,7 @@
             document.getElementById("card-quantity").innerHTML=total_items;
             document.getElementById("subtotal_item").innerHTML=total_items;
             document.getElementById("subtotal_amount").innerHTML=total_amount;
+            document.getElementById("hidden_subtotal").value=total_amount;
 
         }
 
