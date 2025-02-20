@@ -253,11 +253,13 @@
 
             let total_amount=0;
             let total_items=0;
+            let checkout_qty=0; 
             products.forEach(product=>{
                 if(product.is_checked==true){
                     total_items+=product.quantity;
                     total_amount+=product.quantity*product.price;
                 }
+                checkout_qty+=product.quantity;
             });
             
             let grand_total=total_amount+150;
